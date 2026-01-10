@@ -1,3 +1,13 @@
+/*
+Still not up to date with blueprint.jsonc .
+Missing the workflow changes. 
+Also missing some key shema only, advaned stuff. 
+
+TODO: Add:
+required field changes, e.g. only main_function or main_class required, not both. 
+TODO: Read all the required fields to check if these are good or not. 
+TODO: Update the workflow parts up to standart, once standart is finished being developed. 
+*/
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "type": "object",
