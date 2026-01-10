@@ -9,6 +9,7 @@
                 "type": "object",
                 "properties": {
                     "module_name": {"type": "string"},
+                    "description": {"type":"string"},
                     "main_function": {
                         "type": "object",
                         "properties": {
@@ -41,14 +42,58 @@
                             },
                             "depends_on":{
                                 "type":"array",
-                                "properties": {
-                                    "items":{"type":"string"},
-                                   "additionalProperties":false
+                                "items": {
+                                    "type":"string"
                                 },
                                 "additionalProperties":false
                             }
                         },
                         "additionalProperties":false
+                    },
+                    "main_class": {
+                        "type":"object",
+                        "properties": {
+                            "name": {"type":"string"},
+                            "description": {"type":"string"},
+                            "instanse_data": {
+                                "type":"array",
+                                "items": {
+                                    "type":"object",
+                                    "properties": {
+                                        "name": {"type":"string"},
+                                        "type": {"type":"string"},
+                                        "description": {"type":"string"}
+                                    }
+                                }
+                            },
+                            "instanse_methods": {
+                                "type":"array",
+                                "items": {
+                                    "type":"object",
+                                    "properties": {
+                                        "name": {"type":"string"},
+                                        "workflow": {"type":"string"},
+                                        "description": {"type":"string"},
+                                        "input": {
+                                            "type":"array",
+                                            "items": {
+                                                "type":"object",
+                                                "properties": {
+                                                    "name": {"type":"string"},
+                                                    "description": {"type":"string"},
+                                                    "type": {"type":"string"},
+                                                    "example_value": {"type":"string"}
+                                                },
+                                                "required": ["name", "description", "type", "example_value"],
+                                                "additionalProperties": false
+                                            }
+                                        }
+                                    },
+                                    "required": ["name", "workflow", "description", "input"],
+                                    "additionalProperties": false
+                                }
+                            }
+                        }
                     },
                     "functions": {
                         "type":"array",
