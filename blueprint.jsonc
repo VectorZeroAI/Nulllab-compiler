@@ -1,6 +1,22 @@
+/*
+Oh this is gonna be a mess to create the schema for. 
+I think I will need a really advanced schema. 
+*/
 {
     "name": "insert projekt name here",
-    "full_workflow_description": "workflow",
+    "full_workflow_description": {
+        "steps": [
+            {
+                "description": "description",
+                "function_call": "function to call",
+                "save_return?": true,
+                "save_location": "variable name or path to a file",
+                "async_status": "sync or async"
+            }
+        ],
+        "async?": true, // I do support that. 
+        "paralelised?": false // I dont support it yet. 
+    },
     "modules": [
         {
             "module_name": "Insert ModuleName",
