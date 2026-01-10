@@ -14,7 +14,31 @@
                         "properties": {
                             "name": {"type": "string"},
                             "workflow": {"type": "string"}, 
-                            "return": {"type": "string"},
+                            "input": {
+                                "type":"array",
+                                "items": {
+                                    "type":"object",
+                                    "properties":{
+                                        "name": {"type":"string"},
+                                        "description": {"type":"string"},
+                                        "type": {"type":"string"},
+                                        "example_value": {"type":"string"}
+                                    },
+                                    "additionalProperties": false,
+                                    "required": ["name", "description", "type", "example_value"]
+                                }
+                            },
+                            "return": {
+                                "type": "object",
+                                "properties": {
+                                    "name": {"type":"string"},
+                                    "description": {"type":"string"},
+                                    "type": {"type":"string"},
+                                    "example_value": {"type":"string"}
+                                },
+                                "additionalProperties": false,
+                                "required": ["name", "description", "type", "example_value"]
+                            },
                             "depends_on":{
                                 "type":"array",
                                 "properties": {
@@ -33,14 +57,37 @@
                             "properties":{
                                 "name": {"type": "string"},
                                 "workflow":{"type": "string"},
-                                "return":{"type": "string"},
+                                "input": {
+                                    "type":"array",
+                                    "items": {
+                                        "type":"object",
+                                        "properties":{
+                                            "name": {"type":"string"},
+                                            "description": {"type":"string"},
+                                            "type": {"type":"string"},
+                                            "example_value": {"type":"string"}
+                                        },
+                                        "additionalProperties": false,
+                                        "required": ["name", "description", "type", "example_value"]
+                                    }
+                                },
+                                "return": {
+                                    "type": "object",
+                                    "properties": {
+                                        "name": {"type":"string"},
+                                        "description": {"type":"string"},
+                                        "type": {"type":"string"},
+                                        "example_value": {"type":"string"}
+                                    },
+                                    "additionalProperties": false,
+                                    "required": ["name", "description", "type", "example_value"]
+                                },
                                 "depends_on":{
                                     "type":"array",
                                     "items": {
                                         "type":"string"
                                     },
-                                    "additionalProperties":false,
-                                    "required": ["name", "workflow", "return", "depends_on"]
+                                    "additionalProperties":false
                                 }
                             },
                             "additionalProperties":false
