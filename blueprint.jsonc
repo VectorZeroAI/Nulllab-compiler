@@ -1,6 +1,10 @@
 /*
 Oh this is gonna be a mess to create the schema for. 
 I think I will need a really advanced schema. 
+TODO: think about the standarts for the workflow. 
+TODO: add more fields
+TODO: dont forget to update schemas. 
+TODO: Maybe think about what the hell I am doing here, and maybe even write my own languege at that point ?!
 */
 {
     "name": "insert projekt name here",
