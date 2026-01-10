@@ -1,4 +1,5 @@
 {
+    "name": "insert projekt name here",
     "full_workflow_description": "workflow",
     "modules": [
         {
@@ -6,7 +7,20 @@
             "main_function": {
                 "name": "insert funktion name",
                 "workflow": "inser funktion high level workflow here",
-                "return": "insert the returned values, what they mean, and their types. ",
+                "input": [
+                    {
+                        "name": "name",
+                        "description": "description",
+                        "type": "type",
+                        "example_value": "example value"  
+                    }
+                ],
+                "return": {
+                    "name": "name",
+                    "description": "description",
+                    "type": "type",
+                    "example_value": "example value"  
+                },
                 "depends_on": ["list", "of", "funktions", "and", "modules", "this", "funktion", "depends", "on"]
             },    
             
@@ -14,7 +28,20 @@
                 {
                     "name": "insert funktion name",
                     "workflow": "inser funktion high level workflow here",
-                    "return": "insert the returned values, what they mean, and their types. ",
+                    "input": [
+                        {
+                            "name": "name",
+                            "description": "description",
+                            "type": "type",
+                            "example_value": "example value"  
+                        }
+                    ],
+                    "return": {
+                        "name": "name",
+                        "description": "description",
+                        "type": "type",
+                        "example_value": "example value"  
+                    },
                     "depends_on": ["list", "of", "funktions", "and", "modules", "this", "funktion", "depends", "on"]
                 }
             ],
@@ -34,8 +61,17 @@
     ],
     "dependancy_graph": [
         {
-            "funktion_name": "name",
-            "depends_on": "funktion_name" 
+            "module": "name",
+            "depends_on": [
+                {
+                    "function_name": "name",
+                    "of_module": "module_name"
+                },
+                {
+                    "data": "Data description",
+                    "of_module": "module_name"
+                }
+            ] 
         }
     ]
 }
