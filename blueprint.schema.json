@@ -92,7 +92,8 @@
                                     "required": ["name", "workflow", "description", "input"],
                                     "additionalProperties": false
                                 }
-                            }
+                            },
+                            "depends_on": {"type":"array", "items": {"type":"string"}}
                         }
                     },
                     "functions": {
@@ -138,6 +139,64 @@
                             "additionalProperties":false
                         },
                         "additionalProperties":false
+                    },
+                    "classes": {
+                        "type":"array",
+                        "items": {
+                            "type":"object",
+                            "properties": {
+                                "name": {"type":"string"},
+                                "description": {"type":"string"},
+                                "instanse_data": {
+                                    "type":"array",
+                                    "items": {
+                                        "type":"object",
+                                        "properties": {
+                                            "name": {"type":"string"},
+                                            "type": {"type":"string"},
+                                            "description": {"type":"string"}
+                                        }
+                                    }
+                                },
+                                "instanse_methods": {
+                                    "type":"array",
+                                    "items": {
+                                        "type":"object",
+                                        "properties": {
+                                            "name": {"type":"string"},
+                                            "workflow": {"type":"string"},
+                                            "description": {"type":"string"},
+                                            "input": {
+                                                "type":"array",
+                                                "items": {
+                                                    "type":"object",
+                                                    "properties": {
+                                                        "name": {"type":"string"},
+                                                        "description": {"type":"string"},
+                                                        "type": {"type":"string"},
+                                                        "example_value": {"type":"string"}
+                                                    }
+                                                }
+                                            },
+                                            "return": {
+                                                "type":"object",
+                                                "properties": {
+                                                    "name": {"type":"string"},
+                                                    "description": {"type":"string"},
+                                                    "type": {"type":"string"},
+                                                    "example_value": {"type":"string"}
+                                                }
+                                            },
+                                            "depends_on":{
+                                                "type":"array",
+                                                "items": { "type":"string" }
+                                            }
+                                        }
+                                    }
+                                },
+                                "depends_on": {"type":"array", "items": {"type":"string"}}
+                            }
+                        }
                     },
                     "requirements": {
                         "type":"array",
