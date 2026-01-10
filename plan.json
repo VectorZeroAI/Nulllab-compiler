@@ -1,0 +1,21 @@
+{
+    "plan": [
+        {
+            "module_name": "module name here",
+            "instruction": "detailed instruction on how to write the module",
+            "note": "note here, optionally"
+        }
+    ],
+    "style": {
+        "langueges": ["list", "of", "allowed", "langueges", "must", "be", "filled", "out"],
+        "comments": "Comment usage description",
+        "style": "a set of habits / rules to follow during coding",
+        "libraries": ["list", "of", "allowed", "libs", "leave", "empty", "for", "no", "restrinctions"],
+        "naming_convention": [
+            {
+                "pattern": "pattern",
+                "meaning": "meaning / what to use for"
+            }
+        ]
+    }
+}
