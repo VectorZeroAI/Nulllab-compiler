@@ -12,7 +12,53 @@ TODO: Update the workflow parts up to standart, once standart is finished being 
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "type": "object",
     "properties": {
-        "full_workflow_description": {"type": "string"},
+        "full_workflow_description": {
+            "type": "object",
+            "properties": {
+                "steps":{
+                    "type":"array",
+                    "items": {
+                        "type":"object",
+                        "properties": {
+                            "description": {"type":"string"},
+                            "function_call": {"type":"string"},
+                            "save_return?": {"type":"boolean"},
+                            "save_location": {"type":"string"},
+                            "async_status": {"type":"string"}
+                        }
+                    }
+                },
+                "async": { "type":"boolean" },
+                "paralelised?": {"type":"boolean"},
+                "global_data_layout":{
+                    "type":"array",
+                    "items": {
+                        "type":"object",
+                        "properties": {
+                            "type": {"type":"string"},
+                            "name": {"type":"string"},
+                            "description": {"type":"string"},
+                            "declared_by": {"type":"string"},
+                            "mutable": {"type":"boolean"},
+                            "mutable_by": {
+                                "type":"array",
+                                "items": { "type": "string" }
+                            },
+                            "if": {
+                                "properties": {
+                                    "mutable": {"const": true }
+                                },
+                                "required": ["mutable", "type", "name", "description", "declared_by"]
+                            },
+                            "then": {
+                                "required": ["mutable_by"]
+                            },
+                            "additional_properties": false
+                        }
+                    }
+                }
+            }   
+        },
         "modules": {
             "type": "array",
             "items": {
@@ -20,6 +66,33 @@ TODO: Update the workflow parts up to standart, once standart is finished being 
                 "properties": {
                     "module_name": {"type": "string"},
                     "description": {"type":"string"},
+                    "module_data_layout": {
+                        "type":"array",
+                        "items": {
+                            "type":"object",
+                            "properties": {
+                                "type": {"type":"string"},
+                                "name": {"type":"string"},
+                                "description": {"type":"string"},
+                                "declared_by": {"type":"string"},
+                                "mutable": {"type":"boolean"},
+                                "mutable_by": {
+                                    "type":"array",
+                                    "items": { "type": "string" }
+                                }
+                            },
+                            "additionalProperties": false,
+                            "if": {
+                                "properties": {
+                                    "mutable": {"const": true }
+                                },
+                                "required": ["mutable", "type", "name", "description", "declared_by"]
+                            },
+                            "then": {
+                                "required": ["mutable_by"]
+                            }
+                        }
+                    },
                     "main_function": {
                         "type": "object",
                         "properties": {
@@ -236,7 +309,10 @@ TODO: Update the workflow parts up to standart, once standart is finished being 
                     }
                 },
                 "additionalProperties":false,
-                "required": ["module_name", "main_function"]
+                "anyOf":[
+                    {"required": ["module_name", "main_function", "requirements", "module_data_layout"]},
+                    {"required": ["module_name", "main_class", "classes", "requirements", "module_data_layout"]}
+                ]
             },
             "additionalProperties":false
         },
@@ -246,10 +322,42 @@ TODO: Update the workflow parts up to standart, once standart is finished being 
                 "type":"object",
                 "properties":{
                     "function_name": {"type":"string"},
-                    "depends_on":{"type":"string"}
+                    "depends_on_class":{"type":"string"},
+                    "class_name": {"type":"string"},
+                    "method_name": {"type":"string"},
+                    "inherits_from": {"type":"string"},
+                    "depends_on_function": {"type":"string"},
+                    "depends_on_method": {"type":"string"},
+                    "depends_on_data": {
+                        "type":"object", 
+                        "properties": {
+                            "name": {"type":"string"},
+                            "scope": {"type":"string"}, //global, class instanse, module 
+                            "description": {"type":"string"}
+                        },
+                        "additionalProperties": false,
+                        "required": ["name", "scope"]
+                    }
                 },
                 "additionalProperties":false,
-                "required": ["function_name", "depends_on"]
+                "anyOf": [
+                    {"required": ["function_name", "depends_on_function"]},
+                    {"required": ["function_name", "depends_on_data"]},
+                    {"required": ["function_name", "depends_on_class"]},
+                    {"required": ["function_name", "depends_on_class", "depends_on_method"]},
+                    {"required": ["function_name", "depends_on_class", "depends_on_data"]},
+                    {"required": ["function_name", "depends_on_class", "depends_on_function"]},
+                    {"required": ["function_name", "depends_on_class", "depends_on_data", "depends_on_function", "depends_on_method"]},
+                    {"required": ["function_name", "depends_on_class", "depends_on_data", "depends_on_method"]},
+                    {"required": ["method_name", "depends_on_function"]},
+                    {"required": ["method_name", "depends_on_data"]},
+                    {"required": ["method_name", "depends_on_class"]},
+                    {"required": ["method_name", "depends_on_class", "depends_on_method"]},
+                    {"required": ["method_name", "depends_on_class", "depends_on_data"]},
+                    {"required": ["method_name", "depends_on_class", "depends_on_function"]},
+                    {"required": ["method_name", "depends_on_class", "depends_on_data", "depends_on_function",  "depends_on_method"]},
+                    {"required": ["function_name", "depends_on_class", "depends_on_data", "depends_on_method"]}
+                ]
             },
             "additionalProperties":false
         }
