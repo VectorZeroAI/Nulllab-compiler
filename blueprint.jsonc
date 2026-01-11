@@ -1,6 +1,5 @@
 /*
 blueprint.jsonc and blueprint.schema.jsonc are going out of sync ! 
-FIXME: Sync them, or remove the examples, and only leave the schema. 
 */
 {
     "name": "insert projekt name here",
@@ -170,17 +169,18 @@ FIXME: Sync them, or remove the examples, and only leave the schema.
     ],
     "dependancy_graph": [
         {
-            "module": "name",
-            "depends_on": [
-                {
-                    "function_name": "name",
-                    "of_module": "module_name"
-                },
-                {
-                    "data": "Data description",
-                    "of_module": "module_name"
-                }
-            ] 
+            "function_name": "name",
+            "depends_on_class": "name",
+            "class_name":"name",
+            "method_name":"name",               // This one is a lot less confusing at schema level.
+            "inherits_from":"name",             // so those are basicaly all the fields that you can input into, 
+            "depends_on_function":"name",       // Only a combination of them is required. One that makes sense. 
+            "depends_on_method":"name",         // Not every objekt has to have all the fields, so this example is
+            "depends_on_data": {                // So this example is a mess. 
+                "name": "name",                 // TODO: REDO THE EXAMPLE!!!
+                "scope":"name",
+                "description":" optional description"
+            }
         }
     ]
 }
