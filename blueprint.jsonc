@@ -19,19 +19,40 @@ TODO: Maybe think about what the hell I am doing here, and maybe even write my o
             }
         ],
         "async?": true, // I do support that. 
-        "paralelised?": false // I dont support it yet. 
+        "paralelised?": false, // I dont support it yet. 
+        "global_data_layout": [
+            {
+                "type": "string",// variable, struct, file, directory, etc. 
+                "name": "name",
+                "description": "description",
+                "declared_by": "name",
+                "mutable": true, // bool
+                "mutable_by": ["names", "of", "the", "objekts"]
+                // lifespans are not supported yet, due to me not knowing how these work
+            }
+        ]
     },
     "modules": [
         {
             "module_name": "Insert ModuleName",
             "description":"description",
+            "module_data_layout": [
+                {
+                    "type": "string", // variable, file, struct, whatever
+                    "name": "name",
+                    "description":"description",
+                    "declared_by": "name",
+                    "mutable": true, // bool
+                    "mutable_by": ["names", "of", "the", "objekts"]
+                }
+            ],
             "main_class": {
                 "name": "name",
                 "description": "description",
                 "instanse_data": [
                     {
                         "name": "name",
-                        "type": "type",
+                        "type": "type", // variable, file, struct, whatever
                         "description":"description"
                     }
                 ],
