@@ -1,0 +1,182 @@
+{
+    "name": "insert projekt name here",
+    "full_workflow_description": {
+        "steps": [
+            {
+                "description": "description",
+                "function_call": "function to call",
+                "save_return?": true,
+                "save_location": "variable name or path to a file",
+                "async_status": "sync or async"
+            }
+        ],
+        "async?": true, 
+        "paralelised?": false,
+        "global_data_layout": [
+            {
+                "type": "string",
+                "name": "name",
+                "description": "description",
+                "declared_by": "name",
+                "mutable": true,
+                "mutable_by": ["names", "of", "the", "objekts"]
+            }
+        ]
+    },
+    "modules": [
+        {
+            "module_name": "Insert ModuleName",
+            "description":"description",
+            "module_data_layout": [
+                {
+                    "type": "string", 
+                    "name": "name",
+                    "description":"description",
+                    "declared_by": "name",
+                    "mutable": true, 
+                    "mutable_by": ["names", "of", "the", "objekts"]
+                }
+            ],
+            "main_class": {
+                "name": "name",
+                "description": "description",
+                "instanse_data": [
+                    {
+                        "name": "name",
+                        "type": "type",
+                        "description":"description"
+                    }
+                ],
+                "instanse_methods": [
+                    {
+                        "name":"name",
+                        "workflow": "Insert method workflow here",
+                        "description":"description",
+                        "input": [
+                            {
+                                "name": "name",
+                                "description": "description",
+                                "type": "type",
+                                "example_value": "example value"  
+                            }
+                        ],
+                        "return": {
+                            "name": "name",
+                            "description": "description",
+                            "type": "type",
+                            "example_value": "example value"  
+                        },
+                        "depends_on": ["list", "of", "funktions", "and", "modules", "this", "funktion", "depends", "on"]
+                    }
+                ],
+                "depends_on": ["list", "of", "funktions", "and", "modules", "this", "funktion", "depends", "on"]
+            },
+            "main_function": {
+                "name": "insert funktion name",
+                "description":"description",
+                "workflow": "inser funktion high level workflow here",
+                "input": [
+                    {
+                        "name": "name",
+                        "description": "description",
+                        "type": "type",
+                        "example_value": "example value"  
+                    }
+                ],
+                "return": {
+                    "name": "name",
+                    "description": "description",
+                    "type": "type",
+                    "example_value": "example value"  
+                },
+                "depends_on": ["list", "of", "funktions", "and", "modules", "this", "funktion", "depends", "on"]
+            },    
+            "classes": [
+                {
+                    "name": "name",
+                    "description": "description",
+                    "instanse_data": [
+                        {
+                            "name": "name",
+                            "type": "type",
+                            "description":"description"
+                        }
+                    ],
+                    "instanse_methods": [
+                        {
+                            "name":"name",
+                            "workflow": "Insert method workflow here",
+                            "description":"description",
+                            "input": [
+                                {
+                                    "name": "name",
+                                    "description": "description",
+                                    "type": "type",
+                                    "example_value": "example value"  
+                                }
+                            ],
+                            "return": {
+                                "name": "name",
+                                "description": "description",
+                                "type": "type",
+                                "example_value": "example value"  
+                            },
+                            "depends_on": ["list", "of", "funktions", "and", "modules", "this", "funktion", "depends", "on"]
+                        }
+                    ],
+                    "depends_on": ["list", "of", "funktions", "and", "modules", "this", "funktion", "depends", "on"]
+                }
+            ],
+            "funktions": [
+                {
+                    "name": "insert funktion name",
+                    "workflow": "inser funktion high level workflow here",
+                    "description":"description",
+                    "input": [
+                        {
+                            "name": "name",
+                            "description": "description",
+                            "type": "type",
+                            "example_value": "example value"  
+                        }
+                    ],
+                    "return": {
+                        "name": "name",
+                        "description": "description",
+                        "type": "type",
+                        "example_value": "example value"  
+                    },
+                    "depends_on": ["list", "of", "funktions", "and", "modules", "this", "funktion", "depends", "on"]
+                }
+            ],
+            "requirements": [
+                {
+                    "import_name": "Library or module name here",
+                    "use_cases": [
+                        {
+                            "funktion": "Insert funktion name here",
+                            "workflow": "Insert funktion workflow here",
+                            "note": "Insert How? Why? Where? here."
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "dependancy_graph": [
+        {
+            "function_name": "name",
+            "depends_on_class": "name",
+            "class_name":"name",
+            "method_name":"name",               
+            "inherits_from":"name",            
+            "depends_on_function":"name",     
+            "depends_on_method":"name",      
+            "depends_on_data": {            
+                "name": "name",            
+                "scope":"name",
+                "description":" optional description"
+            }
+        }
+    ]
+}
