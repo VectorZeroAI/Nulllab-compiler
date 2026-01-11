@@ -24,3 +24,5 @@ The programm is written in python.
 > [!NOTE]
 > It will be hella slow due to using OpenRouter API, but I also plan to add google gemini api, as well as other apis support. 
 
+> [!WARNING]
+> The jsonc variants of json files are for developers, the plain json variants are for prod, e.g. release usage. 
