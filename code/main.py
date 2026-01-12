@@ -2,7 +2,6 @@
 
 import json
 from rich import print, print_json
-import requests
 import config
 
 def compile(path_to_blueprint: str, path_to_plan: str) -> str:
@@ -31,7 +30,9 @@ def compile(path_to_blueprint: str, path_to_plan: str) -> str:
         print_json(plan)
 
     for i in plan[plan]:
-        raise NotImplementedError("Not implemented the actual compiler yet")
-        # TODO:: Add the new fields to the json and plan specification. 
-        # Make the specification of this repo the upstream one, and make all the other repos load the 
-        # Specifications from here.
+        # Plan: 
+        # Since plan and blueprint are already loaded, 
+        # All I need to do is create the compilation pipeline. 
+        # For one plan step. 
+        # And that plan I am gonna write in markdown in a separate file called : "compiler_doc.cd"
+        raise NotImplementedError("compilation pipeline not implemented yet")
