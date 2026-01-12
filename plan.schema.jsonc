@@ -43,10 +43,14 @@ No TODOs for now.
                         "properties": {
                             "pattern": {"type":"string"},
                             "meaning": {"type":"string"}
-                        }
+                        },
+                        "additionalProperties":false,
+                        "required": ["pattern", "meaning"]
                     }
                 }
-            }
+            },
+            "additionalProperties":false,
+            "required": ["langueges"]
         }
     },
     "additionalProperties":false,
