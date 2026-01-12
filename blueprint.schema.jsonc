@@ -1,8 +1,5 @@
 /*
 Still not up to date with blueprint.jsonc .
-Missing the workflow changes. 
-Also missing some key shema only, advaned stuff. 
-TODO: SYNC WITH the .jsonc example !
 */
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
