@@ -11,9 +11,6 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import PydanticOutputParser
 from pydantic import BaseModel, SecretStr
 
-# system prompt loading from config
-
-
 # output Schema definitions. 
 class CodeFile(BaseModel):
     filename: str
@@ -66,9 +63,12 @@ def compile(path_to_blueprint: str, path_to_plan: str) -> str:
         print("Opened plan: ")
         print_json(plan)
 
+    results = []
+
     for i in plan[plan]:
         result = chain.invoke({
             "spec": f"do: {i} . The full blueprint of the programm : {blueprint}"
             })
         print(result)
-        # TODO: Add saving the output to a file. 
+        results.append(result)
+        # TODO: Add file saving functionality here.
