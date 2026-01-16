@@ -4,35 +4,71 @@ import json
 from rich import print, print_json
 import config
 
+# Langchain chain creation
+
+from langchain_openai import ChatOpenAI
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.output_parsers import PydanticOutputParser
+from pydantic import BaseModel, SecretStr
+
+# system prompt loading from config
+
+
+# output Schema definitions. 
+class CodeFile(BaseModel):
+    filename: str
+    content: str
+
+parser = PydanticOutputParser(pydantic_object=CodeFile)
+prompt = ChatPromptTemplate.from_messages([
+    ("system", f"{config.prompt.prompt}" ),
+    ("human",
+     """
+     JSON SOURSE: \n{spec}\n\n{format_instructions}
+     """)
+    ])
+
+llm = ChatOpenAI(
+    model=config.model,
+    temperature=0,
+    api_key=SecretStr(config.api_key),
+    base_url="https://openrouter.ai/api/v1"
+    )
+
+chain = prompt | llm | parser
+
+# Main function
 def compile(path_to_blueprint: str, path_to_plan: str) -> str:
     """
     This is the main function, the one that compiles the json spec to actual code. 
     I should definetly add some more fields to the plan.json, since what I have there is 100% not enough
     Build info for AI to actually build a correct app. 
+    from langchain.output_parsers import PydanticOutputParser
     """
     if config.verbosity >= 2:
         print("You have entered the following paths for the json objekts to be compiled:")
-    
 
+    # JSON loading
     try:
         with open(path_to_blueprint, "r") as f:
             blueprint = json.load(f)
+            blueprint_str = str(blueprint)
         with open(path_to_plan, "r") as f:
             plan = json.load(f)
-    except RuntimeError as e:
+            plan_str = str(plan)
+    except IOError as e:
         print("[red]files could not be loaded[/red]")
-        raise RuntimeWarning("files failed to load") from e
+        raise IOError("files failed to load") from e
     
     if config.verbosity >= 3:
-        print("Opened bluepirnt: ")
+        print("Opened blueprint: ")
         print_json(blueprint)
         print("Opened plan: ")
         print_json(plan)
 
     for i in plan[plan]:
-        # Plan: 
-        # Since plan and blueprint are already loaded, 
-        # All I need to do is create the compilation pipeline. 
-        # For one plan step. 
-        # And that plan I am gonna write in markdown in a separate file called : "compiler_doc.cd"
-        raise NotImplementedError("compilation pipeline not implemented yet")
+        result = chain.invoke({
+            "spec": f"do: {i} . The full blueprint of the programm : {blueprint}"
+            })
+        print(result)
+        # TODO: Add saving the output to a file. 
