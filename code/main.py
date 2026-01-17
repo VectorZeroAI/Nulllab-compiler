@@ -77,16 +77,21 @@ def compile(path_to_blueprint: str, path_to_plan: str) -> bool:
             })
         except RuntimeError as e:
             print("Couldnt generate the code file. Retrying")
+            print(f"error {e}")
             try:
                 result = chain.invoke({
                     "spec": f"do: {i} . The full blueprint of the programm : {blueprint_str}"
                 })
             except RuntimeError as e2:
                 print("Couldnt Generate the code file. ")
+                print("Failed to generate codefiles. Lanchain chain couldnt complete")
+                print(e2)
                 return False
             else:
                 print("it actually sucseeded on second attempt. Still throuwing an warning")
-                raise RuntimeWarning("The first time failed for some reason. ")
+                print("The first time failed for some reason. ")
+        else:
+            print("results generated")
         if config.verbosity >= 2:
             print(result)
         
@@ -98,5 +103,6 @@ def compile(path_to_blueprint: str, path_to_plan: str) -> bool:
 
         except IOError as e:
             print("couldnt write the answer. ")
+            print(e)
 
     return True
