@@ -14,6 +14,9 @@ from pydantic import BaseModel, SecretStr
 
 # output Schema definitions. 
 class CodeFile(BaseModel):
+    """
+    Returned objekt for the parser
+    """
     filename: str
     content: str
 
@@ -36,7 +39,7 @@ llm = ChatOpenAI(
 chain = prompt | llm | parser
 
 # Main function
-def compile(path_to_blueprint: str, path_to_plan: str) -> str:
+def compile(path_to_blueprint: str, path_to_plan: str) -> bool:
     """
     This is the main function, the one that compiles the json spec to actual code. 
     I should definetly add some more fields to the plan.json, since what I have there is 100% not enough
@@ -68,9 +71,32 @@ def compile(path_to_blueprint: str, path_to_plan: str) -> str:
     parrent_directory = Path(__file__).resolve().parent
 
     for i in plan[plan]:
-        result = chain.invoke({
-            "spec": f"do: {i} . The full blueprint of the programm : {blueprint_str}"
+        try: 
+            result = chain.invoke({
+                "spec": f"do: {i} . The full blueprint of the programm : {blueprint_str}"
             })
-        print(result)
+        except RuntimeError as e:
+            print("Couldnt generate the code file. Retrying")
+            try:
+                result = chain.invoke({
+                    "spec": f"do: {i} . The full blueprint of the programm : {blueprint_str}"
+                })
+            except RuntimeError as e2:
+                print("Couldnt Generate the code file. ")
+                return False
+            else:
+                print("it actually sucseeded on second attempt. Still throuwing an warning")
+                raise RuntimeWarning("The first time failed for some reason. ")
+        if config.verbosity >= 2:
+            print(result)
+        
         results.append(result)
-        # The next step is to create the output directory, and then to write the files to there. 
+        
+        try:
+            file_name: Path = parrent_directory / result.filename #FIXME: I dont trust this shit
+            file_name.write_text(result.content)
+
+        except IOError as e:
+            print("couldnt write the answer. ")
+
+    return True
