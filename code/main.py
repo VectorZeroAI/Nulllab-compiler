@@ -14,31 +14,6 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import PydanticOutputParser
 from pydantic import BaseModel, SecretStr, ValidationError
 
-# output Schema definitions. 
-class CodeFile(BaseModel):
-    """
-    Returned objekt for the parser
-    """
-    filename: str
-    content: str
-
-parser = PydanticOutputParser(pydantic_object=CodeFile)
-prompt = ChatPromptTemplate.from_messages([
-    ("system", f"{config.prompt.prompt}" ),
-    ("human",
-     """
-     JSON SOURSE: \n{spec}\n\n{format_instructions}
-     """)
-    ])
-
-llm = ChatOpenAI(
-    model=config.model,
-    temperature=0,
-    api_key=SecretStr(config.api_key),
-    base_url="https://openrouter.ai/api/v1"
-    )
-
-chain = prompt | llm | parser
 
 parrent_directory = Path(__file__).resolve().parent
 
@@ -50,6 +25,33 @@ def compile(path_to_blueprint: str, path_to_plan: str) -> bool:
     Build info for AI to actually build a correct app. 
     from langchain.output_parsers import PydanticOutputParser
     """
+    # Langchain chain creation
+
+    # output Schema definitions. 
+    class CodeFile(BaseModel):
+        """
+        Returned objekt for the parser
+        """
+        filename: str
+        content: str
+
+    parser = PydanticOutputParser(pydantic_object=CodeFile)
+    prompt = ChatPromptTemplate.from_messages([
+        ("system", f"{config.prompt.prompt}" ),
+        ("human",
+         """
+         JSON SOURSE: \n{spec}\n\n{format_instructions}
+         """)
+        ])
+
+    llm = ChatOpenAI(
+        model=config.model,
+        temperature=0,
+        api_key=SecretStr(config.api_key),
+        base_url="https://openrouter.ai/api/v1"
+        )
+
+    chain = prompt | llm | parser
     if config.verbosity >= 2:
         print("You have entered the following paths for the json objekts to be compiled:")
 
