@@ -3,6 +3,7 @@
 import json
 from rich import print, print_json
 import config
+from pathlib import Path
 
 # Langchain chain creation
 
@@ -52,7 +53,6 @@ def compile(path_to_blueprint: str, path_to_plan: str) -> str:
             blueprint_str = str(blueprint)
         with open(path_to_plan, "r") as f:
             plan = json.load(f)
-            plan_str = str(plan)
     except IOError as e:
         print("[red]files could not be loaded[/red]")
         raise IOError("files failed to load") from e
@@ -65,10 +65,12 @@ def compile(path_to_blueprint: str, path_to_plan: str) -> str:
 
     results = []
 
+    parrent_directory = Path(__file__).resolve().parent
+
     for i in plan[plan]:
         result = chain.invoke({
-            "spec": f"do: {i} . The full blueprint of the programm : {blueprint}"
+            "spec": f"do: {i} . The full blueprint of the programm : {blueprint_str}"
             })
         print(result)
         results.append(result)
-        # TODO: Add file saving functionality here.
+        # The next step is to create the output directory, and then to write the files to there. 
