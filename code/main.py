@@ -99,6 +99,8 @@ def compile(path_to_blueprint: str, path_to_plan: str) -> bool:
         
         results.append(result)
         
+        print(f"Outputting into directory {parrent_directory}/{result.filename}")
+
         try:
             file_name: Path = parrent_directory / result.filename #FIXME: I dont trust this shit
             file_name.write_text(result.content)
@@ -146,3 +148,40 @@ def validate_input_schemas(blueprint_path, plan_path) -> bool:
             RESULT = False
 
     return RESULT
+
+def compile_text_to_spec(path_to_text: str, output_path: str | None = None) -> str | bool:
+    """
+    This is the text to spec compilation pipeline. 
+    This one is not deterministic, but Agentic and errores a lot more often. 
+    Dont expect deterministic outputs yet.
+    """
+    OUTPUT_INTO_STDOUT = False
+    if output_path is None:
+        OUTPUT_INTO_STDOUT = True
+    else:
+        output_file: Path = Path(output_path)
+
+    with open(path_to_text, "r") as f:
+        text = f.read()
+    if not OUTPUT_INTO_STDOUT:
+        if output_file.exists():
+            print("output file exitst. Aborting")
+            return False
+    result = NotImplementedError("TODO: FINISH") #FIXME: Well, finish this
+    try: 
+        raise result
+    except NotImplementedError:
+        raise result
+    else:
+        print("Its actually implemented")
+
+    if OUTPUT_INTO_STDOUT:
+        print(result)
+    else:
+        output_file.write_text(result)
+    
+
+
+if __name__ == "__main__":
+    print("Stupid. This is not supposed to be run directly. ")
+    raise RuntimeError("This is not supposed to be run directly. ")
