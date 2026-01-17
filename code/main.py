@@ -1,16 +1,18 @@
 # Python file. 
 
 import json
+from jsonschema import validate
 from rich import print, print_json
 import config
 from pathlib import Path
+from typing import overload
 
 # Langchain chain creation
 
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import PydanticOutputParser
-from pydantic import BaseModel, SecretStr
+from pydantic import BaseModel, SecretStr, ValidationError
 
 # output Schema definitions. 
 class CodeFile(BaseModel):
@@ -37,6 +39,8 @@ llm = ChatOpenAI(
     )
 
 chain = prompt | llm | parser
+
+parrent_directory = Path(__file__).resolve().parent
 
 # Main function
 def compile(path_to_blueprint: str, path_to_plan: str) -> bool:
@@ -67,8 +71,6 @@ def compile(path_to_blueprint: str, path_to_plan: str) -> bool:
         print_json(plan)
 
     results = []
-
-    parrent_directory = Path(__file__).resolve().parent
 
     for i in plan[plan]:
         try: 
@@ -106,3 +108,41 @@ def compile(path_to_blueprint: str, path_to_plan: str) -> bool:
             print(e)
 
     return True
+
+@overload
+def validate_input_schemas(blueprint_path: str, plan_path: str) -> bool: ...
+@overload
+def validate_input_schemas(blueprint_path: str, plan_path: None) -> bool: ...
+@overload
+def validate_input_schemas(blueprint_path: None, plan_path: str) -> bool: ...
+def validate_input_schemas(blueprint_path, plan_path) -> bool:
+    """
+    This function validates the blueprint and or plan schemas
+    YOU MUST PROVIDE AT LEAST ONE OF THOSE
+    """
+    RESULT = True
+    if blueprint_path is not None:
+        with open(f"{parrent_directory}/../blueprint.schema.json", "r") as f:
+            blueprint_schema = json.load(f)
+        with open(blueprint_path, "r") as f:
+            blueprint = json.load(f)
+        try:
+            validate(instance=blueprint, schema=blueprint_schema)
+        except ValidationError as e:
+            print("validation failed")
+            print(e)
+            RESULT = False
+
+    if plan_path is not None:
+        with open(f"{parrent_directory}/../plan.schema.json", "r") as f:
+            plan_schema = json.load(f)
+        with open(plan_path, "r") as f:
+            plan = json.load(f)
+        try:
+            validate(instance=plan, schema=plan_schema)
+        except ValidationError as e:
+            print("validation failed")
+            print(e)
+            RESULT = False
+
+    return RESULT
