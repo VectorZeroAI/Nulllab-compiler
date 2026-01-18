@@ -191,7 +191,7 @@ def compile_text_to_spec(path_to_text: str, output_path: str | None = None) -> b
                         {blueprint_schema}
                     plan schema:
                         {plan_schema}
-        """ ), #FIXME: ADD SHEMAS
+        """ ), 
         ("human",
          """
             TEXT: \n{text}\n
