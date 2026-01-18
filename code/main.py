@@ -15,13 +15,17 @@ from langchain_core.output_parsers import PydanticOutputParser
 from pydantic import BaseModel, SecretStr, ValidationError
 
 
-parrent_directory = Path(__file__).resolve().parent
+parent_directory = Path(__file__).resolve().parent
+
+# Configs
+
+# TODO: Add the config values here. 
 
 # Main function
 def compile(path_to_blueprint: str, path_to_plan: str) -> bool:
     """
     This is the main function, the one that compiles the json spec to actual code. 
-    I should definetly add some more fields to the plan.json, since what I have there is 100% not enough
+    I should definetely add some more fields to the plan.json, since what I have there is 100% not enough
     Build info for AI to actually build a correct app. 
     from langchain.output_parsers import PydanticOutputParser
     """
@@ -30,7 +34,7 @@ def compile(path_to_blueprint: str, path_to_plan: str) -> bool:
     # output Schema definitions. 
     class CodeFile(BaseModel):
         """
-        Returned objekt for the parser
+        Returned object for the parser
         """
         filename: str
         content: str
@@ -49,7 +53,7 @@ def compile(path_to_blueprint: str, path_to_plan: str) -> bool:
         temperature=0,
         api_key=SecretStr(config.api_key),
         base_url="https://openrouter.ai/api/v1"
-        )
+    )
 
     chain = prompt | llm | parser
     if config.verbosity >= 2:
@@ -74,10 +78,10 @@ def compile(path_to_blueprint: str, path_to_plan: str) -> bool:
 
     results = []
 
-    for i in plan[plan]:
+    for i in plan["plan"]:
         try: 
             result = chain.invoke({
-                "spec": f"do: {i} . The full blueprint of the programm : {blueprint_str}"
+                "spec": f"do: {i} . The full blueprint of the program : {blueprint_str}"
             })
         except RuntimeError as e:
             print("Couldnt generate the code file. Retrying")
@@ -92,7 +96,7 @@ def compile(path_to_blueprint: str, path_to_plan: str) -> bool:
                 print(e2)
                 return False
             else:
-                print("it actually sucseeded on second attempt. Still throuwing an warning")
+                print("it actually succeeded on second attempt. Still throwing an warning")
                 print("The first time failed for some reason. ")
         else:
             print("results generated")
@@ -101,10 +105,10 @@ def compile(path_to_blueprint: str, path_to_plan: str) -> bool:
         
         results.append(result)
         
-        print(f"Outputting into directory {parrent_directory}/{result.filename}")
+        print(f"Outputting into directory {parent_directory}/{result.filename}")
 
         try:
-            file_name: Path = parrent_directory / result.filename #FIXME: I dont trust this shit
+            file_name: Path = parent_directory / result.filename #FIXME: I dont trust this shit
             file_name.write_text(result.content)
 
         except IOError as e:
@@ -114,19 +118,18 @@ def compile(path_to_blueprint: str, path_to_plan: str) -> bool:
     return True
 
 @overload
-def validate_input_schemas(blueprint_path: str, plan_path: str) -> bool: ...
+def validate_input_schemas(blueprint_path: str, plan_path: str) -> bool | str: ...
 @overload
-def validate_input_schemas(blueprint_path: str, plan_path: None) -> bool: ...
+def validate_input_schemas(blueprint_path: str, plan_path: None) -> bool | str: ...
 @overload
-def validate_input_schemas(blueprint_path: None, plan_path: str) -> bool: ...
-def validate_input_schemas(blueprint_path, plan_path) -> bool:
+def validate_input_schemas(blueprint_path: None, plan_path: str) -> bool | str: ...
+def validate_input_schemas(blueprint_path, plan_path) -> bool | str:
     """
     This function validates the blueprint and or plan schemas
     YOU MUST PROVIDE AT LEAST ONE OF THOSE
     """
-    RESULT = True
     if blueprint_path is not None:
-        with open(f"{parrent_directory}/../blueprint.schema.json", "r") as f:
+        with open(f"{parent_directory}/../blueprint.schema.json", "r") as f:
             blueprint_schema = json.load(f)
         with open(blueprint_path, "r") as f:
             blueprint = json.load(f)
@@ -135,10 +138,12 @@ def validate_input_schemas(blueprint_path, plan_path) -> bool:
         except ValidationError as e:
             print("validation failed")
             print(e)
-            RESULT = False
+            result_blueprint = False
+        else:
+            result_blueprint = True
 
     if plan_path is not None:
-        with open(f"{parrent_directory}/../plan.schema.json", "r") as f:
+        with open(f"{parent_directory}/../plan.schema.json", "r") as f:
             plan_schema = json.load(f)
         with open(plan_path, "r") as f:
             plan = json.load(f)
@@ -147,43 +152,124 @@ def validate_input_schemas(blueprint_path, plan_path) -> bool:
         except ValidationError as e:
             print("validation failed")
             print(e)
-            RESULT = False
+            result_plan = False
+        else:
+            result_plan = True
 
-    return RESULT
-
-def compile_text_to_spec(path_to_text: str, output_path: str | None = None) -> str | bool:
+    if result_plan and result_blueprint:
+        return True
+    elif result_plan or result_blueprint:
+        return "One failed, one passed. "
+    else:
+        return False
+def compile_text_to_spec(path_to_text: str, output_path: str | None = None) -> bool:
     """
     This is the text to spec compilation pipeline. 
     This one is not deterministic, but Agentic and errores a lot more often. 
     Dont expect deterministic outputs yet.
     """
+    # Langchain chain creation
+    class SpecFile(BaseModel):
+        """
+        Pydantic objekt for the output
+        """
+        blueprint: dict
+        plan: dict
+
+    with open(f"{parent_directory}/../blueprint.schema.json", "r") as f:
+        blueprint_schema = json.load(f)
+
+    with open(f"{parent_directory}/../plan.schema.json", "r") as f:
+        plan_schema = json.load(f)
+
+    parser = PydanticOutputParser(pydantic_object=SpecFile)
+    prompt = ChatPromptTemplate.from_messages([
+        ("system", f"""You are a text to spec compiler. Your task is to output 2 structured files: plan and blueprint.
+                    You must output valid json only. The json is only valid if it followes this schema. 
+                    Blueprint schema:
+                        {blueprint_schema}
+                    plan schema:
+                        {plan_schema}
+        """ ), #FIXME: ADD SHEMAS
+        ("human",
+         """
+            TEXT: \n{text}\n
+         """)
+        ])
+
+    llm = ChatOpenAI(
+        model=config.model,
+        temperature=0.3,
+        api_key=SecretStr(config.api_key),
+        base_url="https://openrouter.ai/api/v1"
+        )
+
+    chain = prompt | llm | parser
+
     OUTPUT_INTO_STDOUT = False
     if output_path is None:
         OUTPUT_INTO_STDOUT = True
+        output_file: Path = Path("") # dummy
     else:
         output_file: Path = Path(output_path)
 
+
     with open(path_to_text, "r") as f:
         text = f.read()
+
+    # Check for quick exit
     if not OUTPUT_INTO_STDOUT:
         if output_file.exists():
             print("output file exitst. Aborting")
             return False
-    result = NotImplementedError("TODO: FINISH") #FIXME: Well, finish this
-    try: 
-        raise result
-    except NotImplementedError:
-        raise result
+    # Actually result generation
+    try:
+        result = chain.invoke({
+            "text": text
+        })
+    except RuntimeError as e:
+        print(f"errored out. Error: {e}")
+        print("trying again")
+        try:
+            result = chain.invoke({
+                "text": text
+            })
+        except RuntimeError as e:
+            print("failed again. ")
+            print("erroring out")
+            return False
+        else:
+            print("for some reason it actually worked now.")
     else:
-        print("Its actually implemented")
+        print("result was sucsessfully generated. ")
 
+    # Actual Output
     if OUTPUT_INTO_STDOUT:
-        print(result)
+        try:
+            print(str(result))
+        except RuntimeError as e:
+            print("couldnt write to the STDOUT. ")
+            print(f"{e}")
+            return False
+        return True
     else:
-        output_file.write_text(result)
+        try:
+            output_file.write_text(str(result)) # FIXME: split the answer into plan.json and blueprint.json 
+        except IOError as e:
+            print("couldnt write to the file. ")
+            print(f"error: {e}")
+            print("trying again")
+            try:
+                output_file.write_text(result)
+            except IOError as e:
+                print("Couldnt write to the file")
+                print(f"error: {e}")
+                print("erroring out")
+                return False
+    print("wrote into the file")
+    return True
+
     
-
-
 if __name__ == "__main__":
     print("Stupid. This is not supposed to be run directly. ")
     raise RuntimeError("This is not supposed to be run directly. ")
