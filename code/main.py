@@ -250,26 +250,26 @@ def compile_text_to_spec(path_to_text: str, output_dir_path: str | None = None) 
     with open(path_to_text, "r") as f:
         text = f.read()
 
-    blueprint_output_file = Path("")
-    plan_output_file = Path("")
 
-    # Check for quick exit
-    if not OUTPUT_INTO_STDOUT:
+    if OUTPUT_INTO_STDOUT:
+        blueprint_output_file = Path("")
+        plan_output_file = Path("")
+    else:
+        # check for plausability, exit if anythigns wrong,
+        # then proseed with initialising output files.
         if output_dir.exists():
-            if output_dir.is_file:
-                print("The output path contains a file. Aborting.")
-                return False
             if not output_dir.is_dir():
-                print("output exists but is not a directory. ")
-                print("aborting")
+                print("SMT existst on the output path, but is not a dir. Erroring out")
                 return False
             else:
-                print("output destination is a dir. Outputting the files into there. ")
+                blueprint_output_file = output_dir / "blueprint.json"
+                plan_output_file = output_dir / "plan.json"
         else:
-            print("The directory was not found. Creating the dir. ")
+            print("Nothing found on the output path. Creating a dir there. ")
             output_dir.mkdir()
             blueprint_output_file = output_dir / "blueprint.json"
             plan_output_file = output_dir / "plan.json"
+
     # Actually result generation
     try:
         result: SpecFile = chain.invoke({
