@@ -118,12 +118,22 @@ def compile(path_to_blueprint: str, path_to_plan: str) -> bool:
     return True
 
 @overload
-def validate_input_schemas(blueprint_path: str, plan_path: str) -> bool | str: ...
+def validate_input_schemas(blueprint_path: str, plan_path: str, blueprint_json: None, plan_json: None) -> bool | str: ...
 @overload
-def validate_input_schemas(blueprint_path: str, plan_path: None) -> bool | str: ...
+def validate_input_schemas(blueprint_path: str, plan_path: None, blueprint_json: None, plan_json: None) -> bool | str: ...
 @overload
-def validate_input_schemas(blueprint_path: None, plan_path: str) -> bool | str: ...
-def validate_input_schemas(blueprint_path, plan_path) -> bool | str:
+def validate_input_schemas(blueprint_path: None, plan_path: str, blueprint_json: None, plan_json: None) -> bool | str: ...
+@overload
+def validate_input_schemas(blueprint_path: None, plan_path: None, blueprint_json: dict, plan_json: dict) -> bool | str: ...
+@overload
+def validate_input_schemas(blueprint_path: None, plan_path: None, blueprint_json: dict, plan_json: None) -> bool | str: ...
+@overload
+def validate_input_schemas(blueprint_path: None, plan_path: None, blueprint_json: None, plan_json: dict) -> bool | str: ...
+@overload
+def validate_input_schemas(blueprint_path: str, plan_path: None, blueprint_json: None, plan_json: dict) -> bool | str: ...
+@overload
+def validate_input_schemas(blueprint_path: None, plan_path: str, blueprint_json: dict, plan_json: None) -> bool | str: ...
+def validate_input_schemas(blueprint_path, plan_path, blueprint_json, plan_json) -> bool | str:
     """
     This function validates the blueprint and or plan schemas
     YOU MUST PROVIDE AT LEAST ONE OF THOSE
@@ -131,9 +141,13 @@ def validate_input_schemas(blueprint_path, plan_path) -> bool | str:
     result_plan = False
     result_blueprint = False
 
+    with open(f"{parent_directory}/../plan.schema.json", "r") as f:
+        plan_schema = json.load(f)
+
+    with open(f"{parent_directory}/../blueprint.schema.json", "r") as f:
+        blueprint_schema = json.load(f)
+
     if blueprint_path is not None:
-        with open(f"{parent_directory}/../blueprint.schema.json", "r") as f:
-            blueprint_schema = json.load(f)
         with open(blueprint_path, "r") as f:
             blueprint = json.load(f)
         try:
@@ -145,8 +159,6 @@ def validate_input_schemas(blueprint_path, plan_path) -> bool | str:
             result_blueprint = True
 
     if plan_path is not None:
-        with open(f"{parent_directory}/../plan.schema.json", "r") as f:
-            plan_schema = json.load(f)
         with open(plan_path, "r") as f:
             plan = json.load(f)
         try:
@@ -156,6 +168,24 @@ def validate_input_schemas(blueprint_path, plan_path) -> bool | str:
             print(e)
         else:
             result_plan = True
+
+    if plan_json is not None:
+        try:
+            validate(instance=plan_json, schema=plan_schema)
+        except ValidationError as e:
+            print("validation failed")
+            print(e)
+        else:
+            result_plan = True
+    if blueprint_json is not None:
+        try:
+            validate(instance=blueprint_json, schema=blueprint_schema)
+        except ValidationError as e:
+            print("validation failed")
+            print(e)
+        else:
+            result_blueprint = True
+    
     if result_plan and result_blueprint:
         return True
     elif result_plan or result_blueprint:
