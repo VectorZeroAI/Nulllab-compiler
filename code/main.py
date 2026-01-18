@@ -194,11 +194,12 @@ def validate_input_schemas(blueprint_path, plan_path, blueprint_json, plan_json)
         return False
     return "The fuck happened here ? ... Actually, I will still leave this here, to make my LSP happy."
 
-def compile_text_to_spec(path_to_text: str, output_path: str | None = None) -> bool:
+def compile_text_to_spec(path_to_text: str, output_dir_path: str | None = None) -> bool:
     """
     This is the text to spec compilation pipeline. 
     This one is not deterministic, but Agentic and errores a lot more often. 
     Dont expect deterministic outputs yet.
+    Output Path must be a directory. 
     """
     # Langchain chain creation
     class SpecFile(BaseModel):
@@ -239,24 +240,39 @@ def compile_text_to_spec(path_to_text: str, output_path: str | None = None) -> b
     chain = prompt | llm | parser
 
     OUTPUT_INTO_STDOUT = False
-    if output_path is None:
+    if output_dir_path is None:
         OUTPUT_INTO_STDOUT = True
-        output_file: Path = Path("") # dummy
+        output_dir: Path = Path("") # dummy
     else:
-        output_file: Path = Path(output_path)
+        output_dir: Path = Path(output_dir_path)
 
 
     with open(path_to_text, "r") as f:
         text = f.read()
 
+    blueprint_output_file = Path("")
+    plan_output_file = Path("")
+
     # Check for quick exit
     if not OUTPUT_INTO_STDOUT:
-        if output_file.exists():
-            print("output file exitst. Aborting")
-            return False
+        if output_dir.exists():
+            if output_dir.is_file:
+                print("The output path contains a file. Aborting.")
+                return False
+            if not output_dir.is_dir():
+                print("output exists but is not a directory. ")
+                print("aborting")
+                return False
+            else:
+                print("output destination is a dir. Outputting the files into there. ")
+        else:
+            print("The directory was not found. Creating the dir. ")
+            output_dir.mkdir()
+            blueprint_output_file = output_dir / "blueprint.json"
+            plan_output_file = output_dir / "plan.json"
     # Actually result generation
     try:
-        result = chain.invoke({
+        result: SpecFile = chain.invoke({
             "text": text
         })
     except RuntimeError as e:
@@ -286,13 +302,15 @@ def compile_text_to_spec(path_to_text: str, output_path: str | None = None) -> b
         return True
     else:
         try:
-            output_file.write_text(result.json()) # FIXME: split the answer into plan.json and blueprint.json 
+            blueprint_output_file.write_text(json.dumps(result.blueprint))
+            plan_output_file.write_text(json.dumps(result.plan))
         except IOError as e:
             print("couldnt write to the file. ")
             print(f"error: {e}")
             print("trying again")
             try:
-                output_file.write_text(result.json()) # FIXME: split the answer into plan.json and blueprint.json 
+                blueprint_output_file.write_text(json.dumps(result.blueprint))
+                plan_output_file.write_text(json.dumps(result.plan))
             except IOError as e:
                 print("Couldnt write to the file")
                 print(f"error: {e}")
