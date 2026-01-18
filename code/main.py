@@ -63,7 +63,7 @@ def compile(path_to_blueprint: str, path_to_plan: str) -> bool:
     try:
         with open(path_to_blueprint, "r") as f:
             blueprint = json.load(f)
-            blueprint_str = str(blueprint)
+            blueprint_str = json.dumps(blueprint)
         with open(path_to_plan, "r") as f:
             plan = json.load(f)
     except IOError as e:
@@ -83,14 +83,14 @@ def compile(path_to_blueprint: str, path_to_plan: str) -> bool:
             result = chain.invoke({
                 "spec": f"do: {i} . The full blueprint of the program : {blueprint_str}"
             })
-        except RuntimeError as e:
+        except Exception as e:
             print("Couldnt generate the code file. Retrying")
             print(f"error {e}")
             try:
                 result = chain.invoke({
                     "spec": f"do: {i} . The full blueprint of the programm : {blueprint_str}"
                 })
-            except RuntimeError as e2:
+            except Exception as e2:
                 print("Couldnt Generate the code file. ")
                 print("Failed to generate codefiles. Lanchain chain couldnt complete")
                 print(e2)
@@ -162,6 +162,8 @@ def validate_input_schemas(blueprint_path, plan_path) -> bool | str:
         return "one of them"
     elif not result_plan and not result_blueprint:
         return False
+    else:
+        return "The fuck happened here ? "
 
 def compile_text_to_spec(path_to_text: str, output_path: str | None = None) -> bool:
     """
@@ -261,7 +263,7 @@ def compile_text_to_spec(path_to_text: str, output_path: str | None = None) -> b
             print(f"error: {e}")
             print("trying again")
             try:
-                output_file.write_text(result)
+                output_file.write_text(str(result)) # FIXME: split the answer into plan.json and blueprint.json 
             except IOError as e:
                 print("Couldnt write to the file")
                 print(f"error: {e}")
