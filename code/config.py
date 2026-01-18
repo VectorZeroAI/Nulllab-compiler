@@ -17,7 +17,7 @@ model: str = "model here"
 # DONT TOUCH THE PART BELOW
 # genuenly, DONT! I just write the config that way for now. 
 
-class prompt:
+class Prompt:
     if prompt_version == "0.1":
         prompt = """
         You are an deterministic compiler. 
@@ -27,5 +27,5 @@ class prompt:
         """
     if prompt_version == "1":
         BASE = Path(__file__).resolve().parent
-        with open(f"{BASE / "prompt.txt"}", "r") as file:
+        with open(f"""{BASE / "prompt.txt"}""", "r") as file:
             prompt = file.read()
