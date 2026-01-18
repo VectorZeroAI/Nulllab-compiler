@@ -66,9 +66,9 @@ def compile(path_to_blueprint: str, path_to_plan: str) -> bool:
             blueprint_str = json.dumps(blueprint)
         with open(path_to_plan, "r") as f:
             plan = json.load(f)
-    except IOError as e:
+    except Exception as e:
         print("[red]files could not be loaded[/red]")
-        raise IOError("files failed to load") from e
+        raise RuntimeError("files failed to load") from e
     
     if config.verbosity >= 3:
         print("Opened blueprint: ")
@@ -88,7 +88,7 @@ def compile(path_to_blueprint: str, path_to_plan: str) -> bool:
             print(f"error {e}")
             try:
                 result = chain.invoke({
-                    "spec": f"do: {i} . The full blueprint of the programm : {blueprint_str}"
+                    "spec": f"do: {i} . The full blueprint of the program : {blueprint_str}"
                 })
             except Exception as e2:
                 print("Couldnt Generate the code file. ")
@@ -162,8 +162,7 @@ def validate_input_schemas(blueprint_path, plan_path) -> bool | str:
         return "one of them"
     elif not result_plan and not result_blueprint:
         return False
-    else:
-        return "The fuck happened here ? "
+    return "The fuck happened here ? ... Actually, I will still leave this here, to make my LSP happy."
 
 def compile_text_to_spec(path_to_text: str, output_path: str | None = None) -> bool:
     """
@@ -257,19 +256,20 @@ def compile_text_to_spec(path_to_text: str, output_path: str | None = None) -> b
         return True
     else:
         try:
-            output_file.write_text(str(result)) # FIXME: split the answer into plan.json and blueprint.json 
+            output_file.write_text(result.json()) # FIXME: split the answer into plan.json and blueprint.json 
         except IOError as e:
             print("couldnt write to the file. ")
             print(f"error: {e}")
             print("trying again")
             try:
-                output_file.write_text(str(result)) # FIXME: split the answer into plan.json and blueprint.json 
+                output_file.write_text(result.json()) # FIXME: split the answer into plan.json and blueprint.json 
             except IOError as e:
                 print("Couldnt write to the file")
                 print(f"error: {e}")
                 print("erroring out")
                 return False
     print("wrote into the file")
+    # TODO: Add validation using validation function I wrote.
     return True
 
     
