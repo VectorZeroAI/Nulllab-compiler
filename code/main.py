@@ -68,6 +68,7 @@ def compile_json_to_code(path_to_blueprint: str, path_to_plan: str) -> bool:
             plan = json.load(f)
     except Exception as e:
         print("[red]files could not be loaded[/red]")
+        print(f"error : {e}")
         raise RuntimeError("files failed to load") from e
     
     if config.verbosity >= 3:
@@ -76,7 +77,7 @@ def compile_json_to_code(path_to_blueprint: str, path_to_plan: str) -> bool:
         print("Opened plan: ")
         print_json(plan)
 
-    results = []
+    results = [] #TODO : Remove if not needed
 
     for i in plan["plan"]:
         try: 
@@ -84,40 +85,46 @@ def compile_json_to_code(path_to_blueprint: str, path_to_plan: str) -> bool:
                 "spec": f"do: {i} . The full blueprint of the program : {blueprint_str}"
             })
         except Exception as e:
-            print("Couldnt generate the code file. Retrying")
-            print(f"error {e}")
+            if config.verbosity >= 1:
+                print("Couldnt generate the code file. Retrying")
+                print(f"error {e}")
             try:
                 result = chain.invoke({
                     "spec": f"do: {i} . The full blueprint of the program : {blueprint_str}"
                 })
             except Exception as e2:
-                print("Couldnt Generate the code file. ")
-                print("Failed to generate codefiles. Lanchain chain couldnt complete")
-                print(e2)
+                if config.verbosity >= 1:
+                    print("Couldnt Generate the code file. ")
+                    print("Failed to generate codefiles. Lanchain chain couldnt complete")
+                    print(e2)
                 return False
             else:
-                print("it actually succeeded on second attempt. Still throwing an warning")
-                print("The first time failed for some reason. ")
+                if config.verbosity >= 2:
+                    print("it actually succeeded on second attempt. Still throwing an warning")
+                    print("The first time failed for some reason. ")
         else:
-            print("results generated")
+            if config.verbosity >= 2:
+                print("results generated")
+
         if config.verbosity >= 2:
             print(result)
         
         results.append(result) #TODO : Remove if not needed
         
-        print(f"Outputting into directory {parent_directory}/{result.filename}")
+        if config.verbosity >= 2:
+            print(f"Outputting into directory {parent_directory}/{result.filename}")
 
         # filename sanitation
         if ".." in result.filename:
             print(f"Bad path found ! Path : {result.filename}")
             # FIXME : Add a generation retry mechanic here. 
         try:
-            file_name: Path = parent_directory / result.filename 
+            file_name: Path = parent_directory / result.filename  # TODO: Add directory creation logic. 
             file_name.write_text(result.content)
-
         except IOError as e:
-            print("couldnt write the answer. ")
-            print(e)
+            if config.verbosity >= 1:
+                print("couldnt write the answer. ")
+                print(e)
 
     return True
 
@@ -157,8 +164,9 @@ def validate_input_schemas(blueprint_path, plan_path, blueprint_json, plan_json)
         try:
             validate(instance=blueprint, schema=blueprint_schema)
         except ValidationError as e:
-            print("validation failed")
-            print(e)
+            if config.verbosity >= 1:
+                print("validation failed")
+                print(e)
         else:
             result_blueprint = True
 
@@ -168,8 +176,9 @@ def validate_input_schemas(blueprint_path, plan_path, blueprint_json, plan_json)
         try:
             validate(instance=plan, schema=plan_schema)
         except ValidationError as e:
-            print("validation failed")
-            print(e)
+            if config.verbosity >= 1:
+                print("validation failed")
+                print(e)
         else:
             result_plan = True
 
@@ -177,16 +186,18 @@ def validate_input_schemas(blueprint_path, plan_path, blueprint_json, plan_json)
         try:
             validate(instance=plan_json, schema=plan_schema)
         except ValidationError as e:
-            print("validation failed")
-            print(e)
+            if config.verbosity >= 1:
+                print("validation failed")
+                print(e)
         else:
             result_plan = True
     if blueprint_json is not None:
         try:
             validate(instance=blueprint_json, schema=blueprint_schema)
         except ValidationError as e:
-            print("validation failed")
-            print(e)
+            if config.verbosity >= 1:
+                print("validation failed")
+                print(e)
         else:
             result_blueprint = True
     
@@ -263,13 +274,15 @@ def compile_text_to_spec(path_to_text: str, output_dir_path: str | None = None) 
         # then proseed with initialising output files.
         if output_dir.exists():
             if not output_dir.is_dir():
-                print("SMT existst on the output path, but is not a dir. Erroring out")
+                if config.verbosity >= 1:
+                    print("SMT existst on the output path, but is not a dir. Erroring out")
                 return False
             else:
                 blueprint_output_file = output_dir / "blueprint.json"
                 plan_output_file = output_dir / "plan.json"
         else:
-            print("Nothing found on the output path. Creating a dir there. ")
+            if config.verbosity >= 2:
+                print("Nothing found on the output path. Creating a dir there. ")
             output_dir.mkdir()
             blueprint_output_file = output_dir / "blueprint.json"
             plan_output_file = output_dir / "plan.json"
@@ -280,47 +293,65 @@ def compile_text_to_spec(path_to_text: str, output_dir_path: str | None = None) 
             "text": text
         })
     except RuntimeError as e:
-        print(f"errored out. Error: {e}")
-        print("trying again")
+        if config.verbosity >= 1:
+            print(f"errored out. Error: {e}")
+            print("trying again")
         try:
             result = chain.invoke({
                 "text": text
             })
         except RuntimeError as e:
-            print("failed again. ")
-            print("erroring out")
+            if config.verbosity >= 1:
+                print("failed again. ")
+                print("erroring out")
             return False
         else:
-            print("for some reason it actually worked now.")
+            if config.verbosity >= 2:
+                print("for some reason it actually worked now.")
     else:
-        print("result was sucsessfully generated. ")
+        if config.verbosity >= 2:
+            print("result was sucsessfully generated. ")
 
     # Actual Output
     if OUTPUT_INTO_STDOUT:
         try:
-            print(str(result))
+            print("\n\n\n".join((json.dumps(result.blueprint), json.dumps(result.plan))))
+
         except RuntimeError as e:
-            print("couldnt write to the STDOUT. ")
-            print(f"{e}")
+            if config.verbosity >= 1:
+                print("couldnt write to the STDOUT. ")
+                print(f"{e}")
+
             return False
+
         return True
+
     else:
         try:
             blueprint_output_file.write_text(json.dumps(result.blueprint))
             plan_output_file.write_text(json.dumps(result.plan))
         except IOError as e:
-            print("couldnt write to the file. ")
-            print(f"error: {e}")
-            print("trying again")
+            if config.verbosity >= 1:
+                print("couldnt write to the file. ")
+                print(f"error: {e}")
+                print("trying again")
             try:
                 blueprint_output_file.write_text(json.dumps(result.blueprint))
                 plan_output_file.write_text(json.dumps(result.plan))
             except IOError as e:
-                print("Couldnt write to the file")
-                print(f"error: {e}")
-                print("erroring out")
+                if config.verbosity >= 1:
+                    print("Couldnt write to the file")
+                    print(f"error: {e}")
+                    print("erroring out")
+
                 return False
-    print("wrote into the file")
+
+    if config.verbosity >= 2:
+        print("wrote into the file")
+
+    if config.verbosity >= 3:
+        print(f"plan : {json.dumps(result.plan)} \n\n blueprint : {json.dumps(result.blueprint)}")
+
     return True
 
     
