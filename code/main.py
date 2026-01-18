@@ -22,10 +22,10 @@ parent_directory = Path(__file__).resolve().parent
 # TODO: Add the config values here. 
 
 # Main function
-def compile(path_to_blueprint: str, path_to_plan: str) -> bool:
+def compile_json_to_code(path_to_blueprint: str, path_to_plan: str) -> bool:
     """
     This is the main function, the one that compiles the json spec to actual code. 
-    I should definetely add some more fields to the plan.json, since what I have there is 100% not enough
+    I should definitely add some more fields to the plan.json, since what I have there is 100% not enough
     Build info for AI to actually build a correct app. 
     from langchain.output_parsers import PydanticOutputParser
     """
