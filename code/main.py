@@ -261,9 +261,14 @@ def compile_text_to_spec(path_to_text: str, output_dir_path: str | None = None) 
     else:
         output_dir: Path = Path(output_dir_path)
 
-
-    with open(path_to_text, "r") as f:
-        text = f.read()
+    try:
+        with open(path_to_text, "r") as f:
+            text = f.read()
+    except IOError as e:
+        if config.verbosity >= 1:
+            print("couldnt read the text file")
+            print(e)
+        return False
 
 
     if OUTPUT_INTO_STDOUT:
