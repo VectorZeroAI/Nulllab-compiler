@@ -128,6 +128,9 @@ def validate_input_schemas(blueprint_path, plan_path) -> bool | str:
     This function validates the blueprint and or plan schemas
     YOU MUST PROVIDE AT LEAST ONE OF THOSE
     """
+    result_plan = False
+    result_blueprint = False
+
     if blueprint_path is not None:
         with open(f"{parent_directory}/../blueprint.schema.json", "r") as f:
             blueprint_schema = json.load(f)
@@ -138,7 +141,6 @@ def validate_input_schemas(blueprint_path, plan_path) -> bool | str:
         except ValidationError as e:
             print("validation failed")
             print(e)
-            result_blueprint = False
         else:
             result_blueprint = True
 
@@ -152,16 +154,15 @@ def validate_input_schemas(blueprint_path, plan_path) -> bool | str:
         except ValidationError as e:
             print("validation failed")
             print(e)
-            result_plan = False
         else:
             result_plan = True
-
     if result_plan and result_blueprint:
         return True
     elif result_plan or result_blueprint:
-        return "One failed, one passed. "
-    else:
+        return "one of them"
+    elif not result_plan and not result_blueprint:
         return False
+
 def compile_text_to_spec(path_to_text: str, output_path: str | None = None) -> bool:
     """
     This is the text to spec compilation pipeline. 
