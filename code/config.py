@@ -27,5 +27,5 @@ class prompt:
         """
     if prompt_version == "1":
         BASE = Path(__file__).resolve().parent
-        with open(f"{BASE / prompt.txt}", "r") as file:
+        with open(f"{BASE / "prompt.txt"}", "r") as file:
             prompt = file.read()
