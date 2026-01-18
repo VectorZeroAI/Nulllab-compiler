@@ -41,7 +41,7 @@ def compile(path_to_blueprint: str, path_to_plan: str) -> bool:
 
     parser = PydanticOutputParser(pydantic_object=CodeFile)
     prompt = ChatPromptTemplate.from_messages([
-        ("system", f"{config.prompt.prompt}" ),
+        ("system", f"{config.Prompt.prompt}" ),
         ("human",
          """
          JSON SOURSE: \n{spec}\n\n{format_instructions}
@@ -299,7 +299,6 @@ def compile_text_to_spec(path_to_text: str, output_path: str | None = None) -> b
                 print("erroring out")
                 return False
     print("wrote into the file")
-    # TODO: Add validation using validation function I wrote.
     return True
 
     
