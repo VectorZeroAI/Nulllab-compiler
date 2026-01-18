@@ -103,12 +103,16 @@ def compile_json_to_code(path_to_blueprint: str, path_to_plan: str) -> bool:
         if config.verbosity >= 2:
             print(result)
         
-        results.append(result)
+        results.append(result) #TODO : Remove if not needed
         
         print(f"Outputting into directory {parent_directory}/{result.filename}")
 
+        # filename sanitation
+        if ".." in result.filename:
+            print(f"Bad path found ! Path : {result.filename}")
+            # FIXME : Add a generation retry mechanic here. 
         try:
-            file_name: Path = parent_directory / result.filename #FIXME: I dont trust this shit
+            file_name: Path = parent_directory / result.filename 
             file_name.write_text(result.content)
 
         except IOError as e:
