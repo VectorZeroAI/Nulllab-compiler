@@ -266,7 +266,7 @@ def compile_text_to_spec(path_to_text: str, output_dir_path: str | None = None) 
         result: SpecFile = chain.invoke({
             "text": text
         })
-    except RuntimeError as e:
+    except Exception as e:
         if config.verbosity >= 1:
             print(f"errored out. Error: {e}")
             print("trying again")
@@ -274,7 +274,7 @@ def compile_text_to_spec(path_to_text: str, output_dir_path: str | None = None) 
             result = chain.invoke({
                 "text": text
             })
-        except RuntimeError as e:
+        except Exception as e:
             if config.verbosity >= 1:
                 print("failed again. ")
                 print("erroring out")
@@ -291,7 +291,7 @@ def compile_text_to_spec(path_to_text: str, output_dir_path: str | None = None) 
         try:
             print("\n\n\n".join((json.dumps(result.blueprint), json.dumps(result.plan))))
 
-        except RuntimeError as e:
+        except Exception as e:
             if config.verbosity >= 1:
                 print("couldnt write to the STDOUT. ")
                 print(f"{e}")
@@ -330,5 +330,7 @@ def compile_text_to_spec(path_to_text: str, output_dir_path: str | None = None) 
 
     
 if __name__ == "__main__":
-    print("Stupid. This is not supposed to be run directly. ")
-    raise RuntimeError("This is not supposed to be run directly. ")
+    print("[green]This is ran directly by you correctly. [/green]")
+    print("[red]But I didnt implement the entry point. [/red]")
+    from sys import exit
+    exit(1)
