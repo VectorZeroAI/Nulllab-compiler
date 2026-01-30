@@ -136,7 +136,7 @@ def validate_blueprint_json(json_file: dict , blueprint_schema)-> bool:
     Returns True if valid, False otherwise.
     """
     if blueprint_schema is None:
-        with open(f"{parent_directory}/../blueprint.schema.json", "r") as f:
+        with open(f"{parent_directory}../blueprint.schema.json", "r") as f:
             blueprint_schema = json.load(f)
     try:
         validate(instance=json_file, schema=blueprint_schema)
@@ -156,7 +156,7 @@ def validate_plan_json(json_file: dict , plan_schema) -> bool:
     Returns True if valid, False otherwise.
     """
     if plan_schema is None:
-        with open(f"{parent_directory}/../plan.schema.json", "r") as f:
+        with open(f"{parent_directory}../plan.schema.json", "r") as f:
             plan_schema = json.load(f)
     try:
         validate(instance=json_file, schema=plan_schema)
@@ -195,9 +195,9 @@ def compile_text_to_spec(path_to_text: str, output_dir_path: str | None = None) 
         ("system", f"""You are a text to spec compiler. Your task is to output 2 structured files: plan and blueprint.
                     You must output valid json only. The json is only valid if it followes this schema. 
                     Blueprint schema:
-                        {blueprint_schema}
+                        {json.dumps(blueprint_schema)}
                     plan schema:
-                        {plan_schema}
+                        {json.dumps(plan_schema)}
         """ ), 
         ("human",
          """
@@ -257,7 +257,7 @@ def compile_text_to_spec(path_to_text: str, output_dir_path: str | None = None) 
         result: SpecFile = chain.invoke({
             "text": text
         })
-    except RuntimeError as e:
+    except Exception as e:
         if config.verbosity >= 1:
             print(f"errored out. Error: {e}")
             print("trying again")
@@ -282,7 +282,7 @@ def compile_text_to_spec(path_to_text: str, output_dir_path: str | None = None) 
         try:
             print("\n\n\n".join((json.dumps(result.blueprint), json.dumps(result.plan))))
 
-        except RuntimeError as e:
+        except Exception as e:
             if config.verbosity >= 1:
                 print("couldnt write to the STDOUT. ")
                 print(f"{e}")
