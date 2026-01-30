@@ -6,7 +6,6 @@ from referencing.jsonschema import Schema
 from rich import print, print_json
 import config
 from pathlib import Path
-from typing import overload
 
 # Langchain chain creation
 
@@ -128,16 +127,21 @@ def compile_json_to_code(path_to_blueprint: str, path_to_plan: str) -> bool:
                 print(e)
     return True
 
-def validate_blueprint_json(json_file: dict , blueprint_schema)-> bool:
+def __load_bluep_schem__() -> Schema:
+    """
+    This is basically a helper func for setting the default of the Schema for the validate_blueprint_json
+    """
+    with open(f"{parent_directory}/../blueprint.schema.json", "r") as f:
+        blueprint_schema = json.load(f)
+        return blueprint_schema
+
+def validate_blueprint_json(json_file: dict , blueprint_schema: Schema = __load_bluep_schem__() ) -> bool:
     """
     Validates a given blueprint json against the schema. 
     Schema can be provided, otherwise it is loaded from the file.
 
     Returns True if valid, False otherwise.
     """
-    if blueprint_schema is None:
-        with open(f"{parent_directory}../blueprint.schema.json", "r") as f:
-            blueprint_schema = json.load(f)
     try:
         validate(instance=json_file, schema=blueprint_schema)
     except ValidationError as e:
@@ -148,16 +152,21 @@ def validate_blueprint_json(json_file: dict , blueprint_schema)-> bool:
     else:
         return True
 
-def validate_plan_json(json_file: dict , plan_schema) -> bool:
+def __load_plan_schema__() -> Schema:
+    """
+    THe same thingy
+    """
+    with open(f"{parent_directory}/../plan.schema.json", "r") as f:
+        plan_schema = json.load(f)
+        return plan_schema
+
+def validate_plan_json(json_file: dict , plan_schema: Schema = __load_plan_schema__()) -> bool:
     """
     Validates a given plan json against the schema. 
     Schema can be provided, otherwise it is loaded from the file.
 
     Returns True if valid, False otherwise.
     """
-    if plan_schema is None:
-        with open(f"{parent_directory}../plan.schema.json", "r") as f:
-            plan_schema = json.load(f)
     try:
         validate(instance=json_file, schema=plan_schema)
     except ValidationError as e:
@@ -195,9 +204,9 @@ def compile_text_to_spec(path_to_text: str, output_dir_path: str | None = None) 
         ("system", f"""You are a text to spec compiler. Your task is to output 2 structured files: plan and blueprint.
                     You must output valid json only. The json is only valid if it followes this schema. 
                     Blueprint schema:
-                        {json.dumps(blueprint_schema)}
+                        {blueprint_schema}
                     plan schema:
-                        {json.dumps(plan_schema)}
+                        {plan_schema}
         """ ), 
         ("human",
          """
@@ -257,7 +266,7 @@ def compile_text_to_spec(path_to_text: str, output_dir_path: str | None = None) 
         result: SpecFile = chain.invoke({
             "text": text
         })
-    except Exception as e:
+    except RuntimeError as e:
         if config.verbosity >= 1:
             print(f"errored out. Error: {e}")
             print("trying again")
@@ -282,7 +291,7 @@ def compile_text_to_spec(path_to_text: str, output_dir_path: str | None = None) 
         try:
             print("\n\n\n".join((json.dumps(result.blueprint), json.dumps(result.plan))))
 
-        except Exception as e:
+        except RuntimeError as e:
             if config.verbosity >= 1:
                 print("couldnt write to the STDOUT. ")
                 print(f"{e}")
