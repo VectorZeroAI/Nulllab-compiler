@@ -2,6 +2,7 @@
 
 import json
 from jsonschema import validate
+from referencing.jsonschema import Schema
 from rich import print, print_json
 import config
 from pathlib import Path
@@ -125,89 +126,131 @@ def compile_json_to_code(path_to_blueprint: str, path_to_plan: str) -> bool:
             if config.verbosity >= 1:
                 print("couldnt write the answer. ")
                 print(e)
-
     return True
 
-@overload
-def validate_input_schemas(blueprint_path: str, plan_path: str, blueprint_json: None, plan_json: None) -> bool | str: ...
-@overload
-def validate_input_schemas(blueprint_path: str, plan_path: None, blueprint_json: None, plan_json: None) -> bool | str: ...
-@overload
-def validate_input_schemas(blueprint_path: None, plan_path: str, blueprint_json: None, plan_json: None) -> bool | str: ...
-@overload
-def validate_input_schemas(blueprint_path: None, plan_path: None, blueprint_json: dict, plan_json: dict) -> bool | str: ...
-@overload
-def validate_input_schemas(blueprint_path: None, plan_path: None, blueprint_json: dict, plan_json: None) -> bool | str: ...
-@overload
-def validate_input_schemas(blueprint_path: None, plan_path: None, blueprint_json: None, plan_json: dict) -> bool | str: ...
-@overload
-def validate_input_schemas(blueprint_path: str, plan_path: None, blueprint_json: None, plan_json: dict) -> bool | str: ...
-@overload
-def validate_input_schemas(blueprint_path: None, plan_path: str, blueprint_json: dict, plan_json: None) -> bool | str: ...
-def validate_input_schemas(blueprint_path, plan_path, blueprint_json, plan_json) -> bool | str:
+
+
+
+def validate_blueprint_json(json_file: dict , blueprint_schema)-> bool:
     """
-    This function validates the blueprint and or plan schemas
-    YOU MUST PROVIDE AT LEAST ONE OF THOSE
+    Validates a given blueprint json against the schema. 
+    Schema can be provided, otherwise it is loaded from the file.
+
+    Returns True if valid, False otherwise.
     """
-    result_plan = False
-    result_blueprint = False
-
-    with open(f"{parent_directory}/../plan.schema.json", "r") as f:
-        plan_schema = json.load(f)
-
-    with open(f"{parent_directory}/../blueprint.schema.json", "r") as f:
-        blueprint_schema = json.load(f)
-
-    if blueprint_path is not None:
-        with open(blueprint_path, "r") as f:
-            blueprint = json.load(f)
-        try:
-            validate(instance=blueprint, schema=blueprint_schema)
-        except ValidationError as e:
-            if config.verbosity >= 1:
-                print("validation failed")
-                print(e)
-        else:
-            result_blueprint = True
-
-    if plan_path is not None:
-        with open(plan_path, "r") as f:
-            plan = json.load(f)
-        try:
-            validate(instance=plan, schema=plan_schema)
-        except ValidationError as e:
-            if config.verbosity >= 1:
-                print("validation failed")
-                print(e)
-        else:
-            result_plan = True
-
-    if plan_json is not None:
-        try:
-            validate(instance=plan_json, schema=plan_schema)
-        except ValidationError as e:
-            if config.verbosity >= 1:
-                print("validation failed")
-                print(e)
-        else:
-            result_plan = True
-    if blueprint_json is not None:
-        try:
-            validate(instance=blueprint_json, schema=blueprint_schema)
-        except ValidationError as e:
-            if config.verbosity >= 1:
-                print("validation failed")
-                print(e)
-        else:
-            result_blueprint = True
-    
-    if result_plan and result_blueprint:
-        return True
-    elif result_plan or result_blueprint:
-        return "one of them"
-    elif not result_plan and not result_blueprint:
+    if blueprint_schema is None:
+        with open(f"{parent_directory}/../blueprint.schema.json", "r") as f:
+            blueprint_schema = json.load(f)
+    try:
+        validate(instance=json_file, schema=blueprint_schema)
+    except ValidationError as e:
+        if config.verbosity >= 1:
+            print("validation failed")
+            print(e)
         return False
-    return "The fuck happened here ? ... Actually, I will still leave this here, to make my LSP happy."
+    else:
+        return True
+
+def validate_plan_json(json_file: dict , plan_schema) -> bool:
+    """
+    Validates a given plan json against the schema. 
+    Schema can be provided, otherwise it is loaded from the file.
+
+    Returns True if valid, False otherwise.
+    """
+    if plan_schema is None:
+        with open(f"{parent_directory}/../plan.schema.json", "r") as f:
+            plan_schema = json.load(f)
+    try:
+        validate(instance=json_file, schema=plan_schema)
+    except ValidationError as e:
+        if config.verbosity >= 1:
+            print("validation failed")
+            print(e)
+        return False
+    else:
+        return True
+
+# @overload
+# def validate_input_schemas(blueprint_path: str, plan_path: str, blueprint_json: None, plan_json: None) -> bool | str: ...
+# @overload
+# def validate_input_schemas(blueprint_path: str, plan_path: None, blueprint_json: None, plan_json: None) -> bool | str: ...
+# @overload
+# def validate_input_schemas(blueprint_path: None, plan_path: str, blueprint_json: None, plan_json: None) -> bool | str: ...
+# @overload
+# def validate_input_schemas(blueprint_path: None, plan_path: None, blueprint_json: dict, plan_json: dict) -> bool | str: ...
+# @overload
+# def validate_input_schemas(blueprint_path: None, plan_path: None, blueprint_json: dict, plan_json: None) -> bool | str: ...
+# @overload
+# def validate_input_schemas(blueprint_path: None, plan_path: None, blueprint_json: None, plan_json: dict) -> bool | str: ...
+# @overload
+# def validate_input_schemas(blueprint_path: str, plan_path: None, blueprint_json: None, plan_json: dict) -> bool | str: ...
+# @overload
+# def validate_input_schemas(blueprint_path: None, plan_path: str, blueprint_json: dict, plan_json: None) -> bool | str: ...
+# def validate_input_schemas(blueprint_path, plan_path, blueprint_json, plan_json) -> bool | str:
+#     """
+#     This function validates the blueprint and or plan schemas
+#     YOU MUST PROVIDE AT LEAST ONE OF THOSE
+#     """
+#     result_plan = False
+#     result_blueprint = False
+# 
+#     with open(f"{parent_directory}/../plan.schema.json", "r") as f:
+#         plan_schema = json.load(f)
+# 
+#     with open(f"{parent_directory}/../blueprint.schema.json", "r") as f:
+#         blueprint_schema = json.load(f)
+# 
+#     if blueprint_path is not None:
+#         with open(blueprint_path, "r") as f:
+#             blueprint = json.load(f)
+#         try:
+#             validate(instance=blueprint, schema=blueprint_schema)
+#         except ValidationError as e:
+#             if config.verbosity >= 1:
+#                 print("validation failed")
+#                 print(e)
+#         else:
+#             result_blueprint = True
+# 
+#     if plan_path is not None:
+#         with open(plan_path, "r") as f:
+#             plan = json.load(f)
+#         try:
+#             validate(instance=plan, schema=plan_schema)
+#         except ValidationError as e:
+#             if config.verbosity >= 1:
+#                 print("validation failed")
+#                 print(e)
+#         else:
+#             result_plan = True
+# 
+#     if plan_json is not None:
+#         try:
+#             validate(instance=plan_json, schema=plan_schema)
+#         except ValidationError as e:
+#             if config.verbosity >= 1:
+#                 print("validation failed")
+#                 print(e)
+#         else:
+#             result_plan = True
+#     if blueprint_json is not None:
+#         try:
+#             validate(instance=blueprint_json, schema=blueprint_schema)
+#         except ValidationError as e:
+#             if config.verbosity >= 1:
+#                 print("validation failed")
+#                 print(e)
+#         else:
+#             result_blueprint = True
+#     
+#     if result_plan and result_blueprint:
+#         return True
+#     elif result_plan or result_blueprint:
+#         return "one of them"
+#     elif not result_plan and not result_blueprint:
+#         return False
+#     return "The fuck happened here ? ... Actually, I will still leave this here, to make my LSP happy."
 
 def compile_text_to_spec(path_to_text: str, output_dir_path: str | None = None) -> bool:
     """
