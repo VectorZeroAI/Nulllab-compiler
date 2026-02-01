@@ -91,7 +91,8 @@ blueprint.jsonc and blueprint.schema.jsonc are going out of sync !
                     "name": "name",
                     "description": "description",
                     "type": "type",
-                    "example_value": "example value"  
+                    "example_value": "example value",
+                    "return?": true
                 },
                 "depends_on": ["list", "of", "funktions", "and", "modules", "this", "funktion", "depends", "on"]
             },    

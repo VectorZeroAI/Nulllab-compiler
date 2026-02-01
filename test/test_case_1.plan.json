@@ -1,0 +1,10 @@
+{
+    "$schema": "../plan.schema.json",
+    "plan": [
+        {
+            "module_name":"API_BACKEND",
+            "instruction":"Create a backend serving at localhost:8080, that would return a string 'test_string'",
+            "note": ""
+        }
+    ]
+}

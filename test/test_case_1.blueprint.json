@@ -1,0 +1,54 @@
+{   
+    "$schema": "../blueprint.schema.json",
+    "name": "FastAPI",
+    "full_workflow_description": {
+        "steps": [
+            {
+                "description": "import FastAPI",
+                "function_call": "None",
+                "save_return?": false,
+                "async_status": "sync"
+            },
+            {
+                "description": "set up the API",
+                "function_call": "IDK",
+                "save_return?": false,
+                "async_status": "sync"
+            }
+        ],
+        "async?": false,
+        "paralelised?": false,
+        "global_data_layout": [
+            "Nothing, because nothing is needed."
+        ]
+    },
+    "modules": [
+        {
+            "module_name": "The main API",
+            "description": "The main API serving the user",
+            "module_data_layout": [
+                {
+                    "type": "variable",
+                    "name": "served_string",
+                    "description": "The string that the API serves",
+                    "declared_by": "main module, main function",
+                    "mutable": false
+                }
+            ],
+            "main_function": {
+                "name": "serving function",
+                "description": "is this desc really necessery ? This function activates the API and serves the string on the endpoint",
+                "workflow": "Creates the API, and serves the data",
+                "input": [
+                    {
+                        "input?": false
+                    }
+                ],
+                "return": {
+                    "return?": false
+                },
+                "depends_on": ["FastAPI"]
+            }
+        }
+    ]
+}
