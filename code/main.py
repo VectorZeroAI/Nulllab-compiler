@@ -47,7 +47,7 @@ def compile_json_to_code(path_to_blueprint: str, path_to_plan: str) -> bool:
         ("system", f"{config.Prompt.prompt}" ),
         ("human",
          """
-         JSON SOURSE: \n{spec}\n\n{format_instructions}
+         JSON SOURCE: \n{spec}\n\n{format_instructions}
          """)
         ])
 
@@ -373,4 +373,5 @@ if __name__ == "__main__":
         exit(ERRORED_OUT)
     
     # So by this moment, we have both plan and blueprint jsons, validated, and now we can proseed with compiling. 
-
+    compile_json_to_code(raw_input_bluep_json, raw_input_plan_path)
+    

@@ -99,10 +99,19 @@ Still not up to date with blueprint.jsonc .
                                         "name": {"type":"string"},
                                         "description": {"type":"string"},
                                         "type": {"type":"string"},
-                                        "example_value": {"type":"string"}
+                                        "example_value": {"type":"string"},
+                                        "input?":{"type":"boolean"}
                                     },
-                                    "additionalProperties": false,
-                                    "required": ["name", "description", "type", "example_value"]
+                                    "oneOf": [
+                                        { 
+                                            "additionalProperties": false, 
+                                            "required": ["name", "description", "type", "example_value", "input?"]
+                                        },
+                                        {
+                                            "additionalProperties": false,
+                                            "required": ["input?"]
+                                        }
+                                    ]
                                 }
                             },
                             "return": {
@@ -111,10 +120,19 @@ Still not up to date with blueprint.jsonc .
                                     "name": {"type":"string"},
                                     "description": {"type":"string"},
                                     "type": {"type":"string"},
-                                    "example_value": {"type":"string"}
+                                    "example_value": {"type":"string"},
+                                    "return?": {"type": "boolean"}
                                 },
-                                "additionalProperties": false,
-                                "required": ["name", "description", "type", "example_value"]
+                                "oneOf": [
+                                    {
+                                        "additionalProperties": false,
+                                        "required": ["name", "description", "type", "example_value", "return?"]
+                                    },
+                                    {
+                                        "additionalProperties": false,
+                                        "required": ["return?"]
+                                    }
+                                ]
                             },
                             "depends_on":{
                                 "type":"array",
