@@ -17,7 +17,10 @@ from pydantic import BaseModel, SecretStr, ValidationError
 
 parent_directory = Path(__file__).resolve().parent
 
-# Configs
+# Error codes
+FINISHED_NORMALY = 0
+ERRORED_OUT = 1
+
 
 # TODO: Add the config values here. 
 
@@ -328,9 +331,46 @@ def compile_text_to_spec(path_to_text: str, output_dir_path: str | None = None) 
 
     return True
 
-    
 if __name__ == "__main__":
-    print("[green]This is ran directly by you correctly. [/green]")
-    print("[red]But I didnt implement the entry point. [/red]")
     from sys import exit
-    exit(1)
+    print("wellcome to interactive compilation. ")
+    print("Input the path to the compilation plan.json or plan.jsonc please")
+    raw_input_plan_path = input(">>> ")
+    try:
+        with open(f"{raw_input_plan_path}", "r") as f:
+            plan_json = json.load(f)
+    except Exception as e:
+        print("[red]Failed[/red] to get the plan.json")
+        print(e)
+        raise IOError("Failed to open the plan_json file") from e
+    else:
+        print("[green]Did get the plan json[/green]")
+    
+    if validate_plan_json(plan_json):
+        print("provided json passed the correctness validation")
+    else:
+        print("provided json didnt pass validation")
+        print("please review your json")
+        exit(ERRORED_OUT)
+
+    print("Now please enter the blueprint.json or blueprint.jsonc path")
+    raw_input_bluep_json = input(">>> ")
+    
+    try:
+        with open(f"{raw_input_bluep_json}") as f:
+            bluep_json = json.load(f)
+    except Exception as e:
+        print("[red]Failed[/red] to get the blueprint.json")
+        print(e)
+        exit(ERRORED_OUT)
+    else:
+        print("loaded the blueprint.json data")
+
+    if validate_blueprint_json(bluep_json):
+        print("validation passed")
+    else:
+        print("validation failed")
+        exit(ERRORED_OUT)
+    
+    # So by this moment, we have both plan and blueprint jsons, validated, and now we can proseed with compiling. 
+
