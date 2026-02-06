@@ -47,7 +47,7 @@ def compile_json_to_code(path_to_blueprint: str, path_to_plan: str) -> bool:
         ("system", f"{config.Prompt.prompt}" ),
         ("human",
          """
-         JSON SOURCE: \n{spec}\n\n{format_instructions}
+         JSON SOURCE: \n{spec}\n\n
          """)
         ])
 
@@ -333,11 +333,14 @@ def compile_text_to_spec(path_to_text: str, output_dir_path: str | None = None) 
 
 if __name__ == "__main__":
     from sys import exit
-    print("wellcome to interactive compilation. ")
+    print("Wellcome to interactive compilation. ")
     print("Input the path to the compilation plan.json or plan.jsonc please")
     raw_input_plan_path = input(">>> ")
     try:
-        with open(f"{raw_input_plan_path}", "r") as f:
+#        with open(f"{raw_input_plan_path}", "r") as f:
+#            plan_json = json.load(f)
+        plan_json_path = Path(raw_input_plan_path).absolute().resolve().as_posix()
+        with open(f"{plan_json_path}") as f:
             plan_json = json.load(f)
     except Exception as e:
         print("[red]Failed[/red] to get the plan.json")
